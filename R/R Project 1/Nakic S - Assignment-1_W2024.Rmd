@@ -1,0 +1,354 @@
+---
+title: "CIND 123 - Data Analytics: Basic Methods"
+author: "null"
+output:
+  html_document: default
+  pdf_document: default
+---
+<center> <h1> Assignment 1 (10%) </h1> </center>
+<center>  <h3> [Strahinja Nakic] </h2> </center>
+<center> <h3> [CIND 123 DM0 - 500809487] </h2> </center>
+
+<style>
+body {
+    position: absolute;
+    left: 0px;}
+</style>
+---
+# Instructions 
+
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. Review this website for more details on using R Markdown <http://rmarkdown.rstudio.com>.
+
+Use RStudio for this assignment. Complete the assignment by inserting your  \texttt{R} code wherever you see the string "#INSERT YOUR ANSWER HERE".
+
+When you click the **Knit** button, a document (PDF, Word, or HTML format) will be generated that includes both the assignment content as well as the output of any embedded R code chunks.
+
+**NOTE**: YOU SHOULD NEVER HAVE `install.packages` IN YOUR CODE; OTHERWISE, THE `Knit` OPTION WILL GIVE AN ERROR. COMMENT OUT ALL PACKAGE INSTALLATIONS.
+
+Submit **both**  the `rmd` and generated `output` files. Failing to submit both files will be subject to mark deduction. The output file has to be made using the `knit` button as explained in the class. PDF or HTML is preferred. 
+
+## Sample Question and Solution
+
+Use `seq()` to create the vector $(3,5\ldots,29)$.
+
+```{r}
+seq(3, 30, 2)
+seq(3, 29, 2)
+```
+
+## Question 1 (32 points)
+
+## Q1a (8 points)
+Create and print a vector `x` with all odd numbers from 5 to 120 and a vector `y` containing multiples of 5 in the same range. 
+
+HINT: use seq() function. Calculate the sum of lengths of the vectors `x` and `y`.
+
+HINT: use length()
+
+```{r}
+## Creating vector x using seq() to capture all odd numbers from 5 to 120
+
+x <- seq(5, 120, by = 2)
+
+## Creating vector y using (seq) to capture all multiples of five from 5 to 120
+y <- seq(5, 120, by = 5)
+
+## Creating vector sum_of_lengths to denote the sum of the length of vectors x and y
+sum_of_lengths <- length(x) + length(y)
+
+## Printing vectors x and y
+print(x)
+
+print(y)
+
+## Printing the sum of the lengths of x and y
+print(sum_of_lengths)
+
+## Checking work by printing the length of the vectors x and y
+length(x)
+
+length(y)
+
+
+## We know that 58 + 24 = 82, so we know that our sum_of_lengths vector is giving us the desired output.
+```
+
+## Q1b (8 points)
+Create a new vector, `y_cube`, with the cube of elements at indices 2, 4, 6, 10, 15, 18, 21, and 25 from the variable `y`. 
+
+HINT: Use indexing rather than a `for` loop. Calculate the mean and median of the LAST five values from `y_cube`.
+```{r}
+## Sampling vector y
+y <- 1:25
+
+## Extracting elements at specified indices and calculate their cubes
+y_cube <- y[c(2, 4, 6, 10, 15, 18, 21, 25)] ^ 3
+
+## Calculating mean and median of the last five values in y_cube
+last_five_mean <- mean(tail(y_cube, 5))
+last_five_median <- median(tail(y_cube, 5))
+
+## Printing mean and median
+print(last_five_mean)
+print(last_five_median)
+
+
+```
+
+## Q1c (8 points)
+For a given factor variable `factorVar <- factor(c("2.5", "7.1", "6.3", "4.8"))`, would it be correct to use the following commands to convert factor to number?
+
+`as.numeric(factorVar)`
+
+If not, explain your answer and provide the correct one.
+
+```{r}
+## No, the as.numeric() function will not provide the wanted outcome when applied directly to a factor variable.  What it will return is the integer representation of the factor levels, not the numeric values that the levels represent.
+
+## Given factor variable
+factorVar <- factor(c("2.5", "7.1", "6.3", "4.8"))
+
+## Converting factor to character and then to numeric
+numericVar <- as.numeric(as.character(factorVar))
+
+## Printing the result
+print(numericVar)
+
+
+```
+
+## Q1d (8 points)
+A comma-separated values file `dataset.csv` consists of missing values represented by Not A Number (`null`) and question mark (`?`). How can you read this type of files in R? 
+
+**NOTE**: Please make sure you have saved the `dataset.csv` file at your current working directory.
+
+Print the head of the file to ensure everything is correct.
+
+```{r}
+## Reading the dataset in the .csv file and read the missing values 
+dataset <- read.csv("dataset.csv", na.strings = c("null", "?"))
+
+## Printing the head of the dataset 
+head(dataset)
+```
+
+# Question 2 (32 points)
+
+## Q2a (8 points)
+Compute: $$\sum_{n=4}^{25}\frac{(-1)^{n+1}}{(2n+1)!}$$
+
+HINT: Use `factorial(n)` to compute $n!$.
+
+```{r}
+## Inserting the function to calculate factorial
+factorial <- function(n) {if (n == 0) {return(1)} else {return(n * factorial(n - 1))}}
+
+##Computing the sum
+sum_value <- 0
+for (n in 4:25) {
+  sum_value <- sum_value + (-1)^(n + 1) / factorial(2 * n + 1)
+}
+## Printing the head of the dataset 
+print(sum_value)
+
+```
+
+## Q2b (8 points)
+Compute: $$\prod_{n=2}^{6} \left(3n + \frac{2}{3^n} \right)$$
+NOTE: The symbol $\Pi$ represents multiplication.
+```{r}
+## Defining the set of the initial value of the product
+product_value <- 1
+
+## Computing the product
+for (n in 2:6) {product_value <- product_value * (3 * n + 2 / 3^n)}
+
+## Printing the head of the dataset
+print(product_value)
+
+```
+
+### Q2a and Q2b Guidance
+For Q2a and Q2b, you'll need to apply basic mathematical concepts in R. Don't worry if we haven't covered a similar exact problem in class. If you understand how to code in R and the basic math operations (like factorial, powers, sums, and products), you're all set!
+
+Example for Understanding:
+Let's start with a simpler example:
+Compute the sum of the first 5 square numbers. In mathematical terms, this is:
+
+
+$$\sum_{n=1}^{5}{(n)^{2}}$$
+ 
+
+which translates to $1^2+2^2+3^2+4^2+5^2$.
+
+In R, you could solve this by:
+```{r}
+numbers <- 1:5          # Create a vector of numbers 1 to 5
+squared_numbers <- numbers^2  # Square each element of the vector
+sum_squares <- sum(squared_numbers)  # Sum up the squared numbers
+sum_squares
+```
+
+Now, come back to Q2a and Q2b. Your task in those questions is similar. You'll use loops to iterate over a range of numbers, applying the specified mathematical operations at each step. Remember to use built-in R functions like `factorial()`, `sum()`, and `prod()` when needed.
+
+In **Q2a**, you'll be computing a sum, but each term involves a factorial and a power. Remember, R can perform these operations on entire vectors.
+
+In **Q2b**, you'll be computing a product, and each term is a simple arithmetic expression involving numbers and powers.
+
+
+## Q2c (8 points)
+Describe what the following R command does:
+`rep(1:3, each = 2)[NA]`
+```{r}
+## 1:3 creates a vector that contains the integers 1,2,3.
+
+##rep(1:3, each = 2) repeats each element of the vector 1:3 twice resulting in a longer vector
+rep(1:3, each = 2)
+
+## "NA" subsets the resulting vector with a missing value (NA). In R, this operation returns NA
+rep(1:3, each = 2)[NA]
+
+## Therefore the result of the command is "NA"
+
+
+```
+
+## Q2d (8 points)
+Describe the purpose of `is.logical()`, `is.character()`, `is.numeric()`, and `is.na()` functions? Please use `x <- c("a", FALSE, "b", NA, 2, TRUE)` to explain your description.
+```{r}
+## It is used to check the data type or properties of elements in a vector or variable.
+
+## is.logical(): This is a function that checks if the elements in a vector are of logical data type (TRUE or FALSE). This means that applying the above formula will return TRUE for the third and sixth elements because they are logical values (FALSE and TRUE), and FALSE for the other elements.
+
+## is.character(): This function checks if the elements in a vector are of character data type. This means that applying the above formula will return TRUE for the first, third, and fourth elements because they are character strings ("a", "b", and "NA" is treated as a missing character value), and FALSE for the other elements.
+
+## is.numeric(): This function checks if the elements in a vector are of numeric data type (integers or floating-point numbers). This means that applying the above formula will return TRUE for the fifth element because it is a numeric value (2), and FALSE for the other elements.
+
+## is.na(): This function checks if the elements in a vector are missing values (NA).Lastly the above formula will return TRUE for the fourth element because it is "NA" which means missing, and FALSE for the other elements. Note that NA is not a missing value in terms of logical, character, or numeric types, it's a distinct type on its own, but is.na() checks for the presence.
+
+
+```
+
+# Question 3 (36 points)
+The `airquality` dataset contains daily air quality measurements in New York from May to September 1973. The variables include Ozone level, Solar radiation, wind speed, temperature in Fahrenheit, month, and day. Please see the detailed description using `help("airquality")`.
+
+Install the `airquality` data set on your computer using the command `install.packages("datasets")`. Then load the `datasets` package into your session.
+```{r}
+##Creating dataset
+install.packages("dataset", repos = "https://cloud.r-project.org/")
+library(dataset)
+
+```
+
+## Q3a (4 points)
+Display the last 10 rows of the `airquality` data set.
+```{r}
+## Loading the airquality dataset
+data(airquality)
+
+## Displaying the last 10 rows of the dataset
+tail(airquality, 10)
+
+
+```
+
+## Q3b (8 points)
+Compute the median of the first four variables (Ozone, Solar.R, Wind and Temp) for the fifth month using the `sapply()` function.
+
+HINT: You might need to consider removing the `NA` values; otherwise, the median will not be computed. 
+```{r}
+
+## Loading the airquality dataset
+data(airquality)
+
+## Viewing the structure of the dataset
+str(airquality)
+
+## Checking the column names
+names(airquality)
+
+## Subsetting the data for the fifth month (May)
+may_data <- airquality[airquality$Month == 5, ]
+
+## Removing NA values
+may_data <- na.omit(may_data)
+
+## Computing the median for each variable
+median_values <- sapply(may_data[, c("Ozone", "Solar.R", "Wind", "Temp")], median)
+
+## Printing the median values
+print(median_values)
+
+
+
+```
+
+## Q3c (8 points)
+Construct two boxplots for the `Ozone ` and `Solar.R` variables.
+Then, compute the values of all outliers which lie beyond the whiskers.
+```{r}
+## Loading the dataset
+data(airquality)
+
+## Constructing boxplots for Ozone and Solar.R variables
+par(mfrow=c(1,2))
+boxplot(airquality$Ozone, main="Ozone", ylab="Ozone (ppb)", ylim=c(0, 200))
+boxplot(airquality$Solar.R, main="Solar.R", ylab="Solar Radiation (lang)", ylim=c(0, 400))
+
+## Computing outliers for Ozone
+ozone <- airquality$Ozone
+ozone_outliers <- boxplot.stats(ozone)$out
+
+## Computing outliers for Solar.R
+solar <- airquality$Solar.R
+solar_outliers <- boxplot.stats(solar)$out
+
+## Printing the outliers
+cat("Outliers for Ozone: ", ozone_outliers, "\n")
+cat("Outliers for Solar.R: ", solar_outliers, "\n")
+
+
+
+```
+
+## Q3d (8 points)
+Compute the lower quartile of the `Temp` variable with two different methods.
+
+HINT: Only show the lower quartile using indexing.
+For the type of quartile, please see https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/quantile.
+```{r}
+## Loading the airquality dataset
+data(airquality)
+
+## Computing the lower quartile of Temp using quantile function
+lower_quartile_quantile <- quantile(airquality$Temp, probs = 0.25)
+
+## Printing the lower quartile
+print(lower_quartile_quantile)
+
+
+```
+
+## Q3e (8 points)
+Construct a bar chart to describe the number of entries by `Month`.
+
+HINT: use the `table()` function to count and tabulate the number of entries within a `Month`.
+
+Don't forget to name each axis and have a title for the plot.
+
+```{r}
+## Loading the dataset
+data(airquality)
+
+## Creating a bar chart of entries by month
+barplot(table(airquality$Month),
+        main = "Entries by Month",
+        xlab = "Month",
+        ylab = "Number of Entries",)
+
+
+```
+
+
+END of Assignment #1.

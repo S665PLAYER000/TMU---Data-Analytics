@@ -1,0 +1,441 @@
+---
+title: 'CIND 123 - Data Analytics: Basic Methods'
+author: 
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+<center> <h1> Assignment 2 (10%) </h1> </center>
+<center> <h3> [Strahinja Nakic] </h3> </center>
+<center> <h3> [DM0 & 500809487] </h3> </center>
+---
+
+## Instructions 
+
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. Review this website for more details on using R Markdown <http://rmarkdown.rstudio.com>.
+
+Use RStudio for this assignment. Complete the assignment by inserting your R code wherever you see the string "#INSERT YOUR ANSWER HERE".
+
+When you click the **Knit** button, a document (PDF, Word, or HTML format) will be generated that includes both the assignment content as well as the output of any embedded R code chunks.
+
+Submit **both**  the rmd and generated output files. Failing to submit both files will be subject to mark deduction.
+
+## Sample Question and Solution
+
+Use `seq()` to create the vector $(100,97\ldots,4)$.
+
+```{r}
+seq(100, 3, -3)
+```
+
+
+
+
+## Question 1 (40 points)
+
+The Titanic Passenger Survival Data Set provides information on the fate of passengers on the fatal maiden voyage of the ocean liner "Titanic." The dataset is available from the Department of Biostatistics at the Vanderbilt University School of Medicine (https://biostat.app.vumc.org/wiki/pub/Main/DataSets/titanic3.csv) in several formats. Store the Titanic Data Set `titanicDataset` using the following commands. 
+
+
+```{r}
+##install.packages("titanic")
+library(titanic)
+titanicDataset <- read.csv(file = "https://biostat.app.vumc.org/wiki/pub/Main/DataSets/titanic3.csv", stringsAsFactors = F)
+str(titanicDataset)
+
+## Installing and load the 'titanic' package if you haven't already
+install.packages("titanic")
+library(titanic)
+
+## Reading the Titanic dataset from the provided URL
+titanicDataset <- read.csv(file = "https://biostat.app.vumc.org/wiki/pub/Main/DataSets/titanic3.csv", stringsAsFactors = FALSE)
+
+## Printing the structure of the Titanic dataset
+str(titanicDataset)
+
+```
+
+a) Extract and show the columns `name`, `fare`, `sibsp`, and `parch` into a new data frame named 'titanicSubset'. (5 points)
+```{r}
+## Extracting the specified columns into a new dataframe 'titanicSubset'
+titanicSubset <- titanicDataset[, c("name", "fare", "sibsp", "parch")]
+
+## Viewing the first few rows of the 'titanicSubset' dataframe
+head(titanicSubset)
+
+
+```
+b) Numerical data: Use the count() function from the `dplyr` package to calculate the total number of passengers who were children (age less than 18) and survived. (5 points)
+HINT: To count the occurrences of survived or not in the titanicDataset data frame using the `dplyr` package, you can use the pipe operator (%>%) to chain operations. 
+
+```{r}
+## Loading the dplyr package
+library(dplyr)
+
+## Filtering the Titanic dataset to include only passengers who were children (age less than 18) and survived
+child_survivors <- titanicDataset %>%
+  filter(age < 18 & survived == 1) %>%  
+  ## Filter for passengers who were children (age less than 18) and survived
+  count()
+
+## Viewing the results
+print(child_survivors)
+
+
+```
+
+
+
+c) Categorical data: Use count() and group_by() functions from the dplyr package to calculate the number of passengers by `sex`. (5 points)
+HINT: Use group_by() first then pipe the result to count() to calculate the number of passengers. 
+```{r}
+## Loading the dplyr package
+library(dplyr)
+
+## Assuming you have a dataframe named 'titanicDataset' with a column named 'sex'
+
+## Using group_by() to group the data by 'sex', then pipe it to count() to calculate the number of passengers
+passenger_counts <- titanicDataset %>%
+  group_by(sex) %>%
+  count()
+
+## Viewing the result
+print(passenger_counts)
+
+
+```
+
+d) Find the passengers in the data frame whose age information is missing, and fill them with the median age of passengers. (3 points)
+
+```{r}
+# Calculate the median age of passengers
+median_age <- median(titanicDataset$age, na.rm = TRUE)
+
+# Replace missing age values with the median age
+titanicDataset$age[is.na(titanicDataset$age)] <- median_age
+
+# Check if there are any missing age values left
+missing_age_count <- sum(is.na(titanicDataset$age))
+
+# Print the count of missing age values
+print(paste("Number of missing age values after filling with median age:", missing_age_count))
+
+
+```
+
+e) Use the aggregate() function to calculate the 'survivalCount' of each `pclass` and calculate the survival rate of passengers in each passenger class. Then, draw a conclusion on which passenger class has the highest survival rate. (5 points)
+
+
+```{r}
+## Calculating survival count of each pclass
+survival_counts <- aggregate(survived ~ pclass, data = titanicDataset, FUN = sum)
+
+## Calculating total count of passengers in each pclass
+total_counts <- aggregate(survived ~ pclass, data = titanicDataset, FUN = length)
+
+## Merging survival counts and total counts by pclass
+survival_summary <- merge(survival_counts, total_counts, by = "pclass")
+
+## Renaming columns for clarity
+colnames(survival_summary) <- c("pclass", "survivalCount", "totalCount")
+
+## Calculating survival rate
+survival_summary$survivalRate <- survival_summary$survivalCount / survival_summary$totalCount * 100
+
+## Printing the survival summary
+print(survival_summary)
+
+## As seen in the data the First class has a higher survival rate
+
+```
+
+
+f) Use a boxplot to display the distribution of `fare` for each `sex` and infer which gender tends to pay higher fares. (5 points)
+```{r}
+
+## Selecting a mirror interactively
+chooseCRANmirror(ind=1) 
+
+## Installing the packages needed
+install.packages("ggplot2")
+
+# Loading necessary packages
+library(ggplot2)
+
+## Creating a boxplot
+ggplot(titanicDataset, aes(x = sex, y = fare, fill = sex)) +(ylim(0,500)) +
+  geom_boxplot() +
+  labs(x = "Sex", y = "Fare", title = "Distribution of Fare by Sex") +
+  theme_minimal()
+
+## As seen in the data it is evident that females pay a higher fare
+
+```
+
+
+g) Calculate the mean `fare` for each `sex` and describe if the calculation aligns with the boxplot. (5 points)
+```{r}
+## Calculating the mean fare for each sex
+fare_means <- aggregate(titanicDataset$fare, by = list(titanicDataset$sex), FUN = mean, na.rm = TRUE)
+
+## Printing the mean fare for each sex
+print(fare_means)
+
+## The calculation aligns with the boxplot as it is evident that the female fars tend to be between roughly 130 - 270 and male fares are more concentrated towards the 50-100 fare range. 
+
+```
+
+
+h) Use the for loop and if control statements to list the women's non-empty home destinations, age 50 or older, who embarked from Southampton on the Titanic. (7 points)
+```{r}
+## Creating an empty vector to store the results
+selected_passengers <- c()
+
+## Looping through each row in the Titanic dataset
+for (i in 1:nrow(titanicDataset)) {
+  ## Checking if the passenger is a woman, has a non-empty home destination, is age 50 or older, and embarked from Southampton
+  if (titanicDataset$sex[i] == "female" && !is.na(titanicDataset$home.dest[i]) && 
+      titanicDataset$age[i] >= 50 && titanicDataset$embarked[i] == "S") {
+    ## If all conditions are met, add the passenger to the selected_passengers vector
+    selected_passengers <- c(selected_passengers, paste(titanicDataset$name[i], "-", titanicDataset$home.dest[i]))
+  }
+}
+
+## Printing the selected passengers
+print(selected_passengers)
+
+```
+
+
+
+## Question 2 (15 points)
+
+100 computers work together in a network. Based on historical data, each computer has a probability of 0.03 of encountering a software issue. If a computer encounters an issue, it affect the network's performance.
+
+a) Determine the probability that the network operates without any computer encountering a software issue. (5 points)
+```{r}
+## Parameters for question
+n <- 100  # number of computers
+p <- 0.03  # probability of encountering an issue for a single computer
+
+## Calculating the probability using the binomial distribution formula
+probability_no_issue <- dbinom(0, size = n, prob = p)
+
+## Printing the results
+cat("Probability that the network operates without any computer encountering a software issue:", probability_no_issue, "\n")
+
+
+```
+
+b) Utilize the Binomial approximation to estimate the probability that at least 5 computers out of 100 encounter software issues. (5 points)
+```{r}
+## Parameters for the question
+n <- 100  # Number of trials (computers)
+p <- 0.05  # Probability of success (encountering software issues)
+k <- 5  # Number of successes (at least 5)
+
+## Mean and standard deviation of the Binomial distribution
+mu <- n * p
+sigma <- sqrt(n * p * (1 - p))
+
+## Standardizing k
+z <- (k - mu) / sigma
+
+## Calculating cumulative probability (at least 5 successes)
+prob_at_least_5 <- pnorm(z)
+
+## Printing the result
+cat("Probability of at least 5 computers encountering software issues:", prob_at_least_5, "\n")
+
+
+```
+
+c) Assume the first and second computers are independent. Calculate the conditional probability that the second computer (Computer B) encounters a software issue given that the first computer (Computer A) does not encounter any issue. (5 points)
+```{r}
+## Parameters for question
+p <- 0.03  # probability of encountering an issue for a single computer
+
+## Probability that Computer A does not encounter any issues
+prob_no_issue_A <- 1 - p
+
+## Probability that Computer B encounters an issue (given A doesn't encounter any issue)
+prob_issue_B_given_no_issue_A <- p
+
+## Conditional probability that Computer B encounters an issue given that Computer A doesn't encounter any issue
+conditional_probability <- prob_issue_B_given_no_issue_A
+
+## Printing the results
+cat("Conditional probability that the second computer encounters a software issue given that the first computer does not encounter any issue:", conditional_probability, "\n")
+
+```
+
+
+
+## Question 3 (25 points)
+
+On average, John receives 3 emails a day.
+
+a) Calculate all the probabilities that John receives 2, 3, ..., to 9 emails in a day. (5 points)
+```{r}
+## Loading the Poisson distribution function
+library(stats)
+
+## Mean number of emails per day
+lambda <- 3
+
+## Number of emails from 2 to 9
+num_emails <- 2:9
+
+## Calculate probabilities
+probabilities <- dpois(num_emails, lambda)
+
+## Printing the probabilities
+for (i in 1:length(num_emails)) {
+  cat("Probability of receiving", num_emails[i], "emails in a day:", probabilities[i], "\n")
+}
+
+```
+
+
+b) Determine the probability that John receives 4 emails or more in a day. (5 points)
+```{r}
+## Loading the Poisson distribution function
+library(stats)
+
+## Mean number of emails per day
+lambda <- 3
+
+## Probability of receiving 4 or more emails
+prob_4_or_more <- 1 - ppois(3, lambda)
+
+## Printing the probability
+cat("Probability of receiving 4 or more emails in a day:", prob_4_or_more, "\n")
+
+
+```
+
+
+c) Compare the similarity between Binomial and Poisson distribution. (15 points @ 5 point each)
+1) Generate 50,000 samples for a Binomial random variable using parameters described in Question 3.
+2) Generate 50,000 samples for a Poisson random variable using parameters described in Question 3.
+3) Illustrate how well the Poisson probability distribution approximates the Binomial probability distribution using multhist() from the 'plotrix' package.
+```{r}
+## Loading the required package
+install.packages("plotrix")  # Install only if not installed already
+library(plotrix)
+
+## Parameters for question
+n <- 100  # Number of trials
+p <- 0.3  # Probability of success
+lambda <- n * p  # Poisson parameter
+
+## Step 1: Generate 50,000 samples for a Binomial random variable
+binomial_samples <- rbinom(50000, size = n, prob = p)
+
+## Step 2: Generate 50,000 samples for a Poisson random variable
+poisson_samples <- rpois(50000, lambda = lambda)
+
+## Step 3: Illustrate the similarity using multhist()
+multhist(list(binomial_samples, poisson_samples), col = c("blue", "red"),
+         xlab = "Value", ylab = "Frequency", main = "Binomial vs. Poisson Distribution")
+
+## Adding a legend
+legend("topright", legend = c("Binomial", "Poisson"), fill = c("blue", "red"))
+
+
+```
+
+
+
+## Question 4 (20 points)
+
+Write a script in R to compute the following probabilities of a normal random variable with mean 12 and variance 36.
+
+a) Calculate the probability that it lies between 10.5 and 18.7 (inclusive). (5 points)
+```{r}
+## Parameters for question
+mean <- 12
+variance <- 36
+lower_bound <- 10.5
+upper_bound <- 18.7
+
+## Calculating standard deviation (square root of variance)
+sd <- sqrt(variance)
+
+## Calculating the probability using the CDF of the normal distribution
+probability <- pnorm(upper_bound, mean, sd) - pnorm(lower_bound, mean, sd)
+
+## Printing the results
+cat("Probability that the random variable lies between", lower_bound, "and", upper_bound, "inclusive:", probability, "\n")
+
+
+```
+
+
+b) Determine the probability that it is greater than 16.03. (5 points)
+```{r}
+## Parameters for question
+mean <- 12
+variance <- 36
+threshold <- 16.03
+
+## Calculating standard deviation (square root of variance)
+sd <- sqrt(variance)
+
+## Calculating the probability using the complement of the CDF of the normal distribution
+probability <- 1 - pnorm(threshold, mean, sd)
+
+## Printing the results
+cat("Probability that the random variable is greater than", threshold, ":", probability, "\n")
+
+
+```
+
+
+c) Find the probability that it is less than or equal to 14.2. (5 points)
+```{r}
+## Parameters for question
+mean <- 12
+variance <- 36
+threshold <- 14.2
+
+## Calculating standard deviation (square root of variance)
+sd <- sqrt(variance)
+
+## Calculating the probability using the CDF of the normal distribution
+probability <- pnorm(threshold, mean, sd)
+
+## Printing the results
+cat("Probability that the random variable is less than or equal to", threshold, ":", probability, "\n")
+
+
+```
+
+
+d) Compute the probability that it is less than 11 or greater than 14. (5 points)
+```{r}
+## Parameters for question
+mean <- 12
+variance <- 36
+lower_threshold <- 11
+upper_threshold <- 14
+
+## Calculating standard deviation (square root of variance)
+sd <- sqrt(variance)
+
+## Calculating probabilities using the cumulative distribution function (CDF)
+probability_less_than_11 <- pnorm(lower_threshold, mean, sd)
+probability_greater_than_14 <- 1 - pnorm(upper_threshold, mean, sd)
+
+## Probability that the random variable is less than 11 or greater than 14
+probability <- probability_less_than_11 + probability_greater_than_14
+
+## Printing the results
+cat("Probability that the random variable is less than 11 or greater than 14:", probability, "\n")
+
+
+```
+
+
+END of Assignment #2.
